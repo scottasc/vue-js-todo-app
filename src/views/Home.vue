@@ -21,20 +21,69 @@
 
 <style>
 
+body {
+  width: 100wh;
+  height: 90vh;
+  color: #fff;
+  background: linear-gradient(-45deg, #000000, #003300, #0000AA, #0AB300);
+  background-size: 400% 400%;
+  -webkit-animation: Gradient 15s ease infinite;
+  -moz-animation: Gradient 15s ease infinite;
+  animation: Gradient 15s ease infinite;
+}
+
+@-webkit-keyframes Gradient {
+  0% {
+    background-position: 0% 50%
+  }
+  50% {
+    background-position: 100% 50%
+  }
+  100% {
+    background-position: 0% 50%
+  }
+}
+
+@-moz-keyframes Gradient {
+  0% {
+    background-position: 0% 50%
+  }
+  50% {
+    background-position: 100% 50%
+  }
+  100% {
+    background-position: 0% 50%
+  }
+}
+
+@keyframes Gradient {
+  0% {
+    background-position: 0% 50%
+  }
+  50% {
+    background-position: 100% 50%
+  }
+  100% {
+    background-position: 0% 50%
+  }
+}
+
+h1, h6 {
+  font-family: 'Open Sans';
+  font-weight: 300;
+  text-align: center;
+  position: absolute;
+  top: 45%;
+  right: 0;
+  left: 0;
+}
+
   input {
     border: solid;
     padding-bottom: 100px;
     width: 500px;
     font-size: 75px;
   }
-
-  h1, h2, input {
-    color: darkgreen;
-  }
-
-  body {
-    background-color: lightgray;
-      }
 
   .strike {
     text-decoration: line-through;
@@ -74,11 +123,16 @@ export default {
   },
   methods: {
     addTask: function() {
-      if (this.newTask.text !== "") {
-      this.tasks.push(this.newTask);
+        var params = {text: this.newTask.text};
+
+        axios
+        .post("http://localhost:3000/api/tasks", params)
+        .then(function(response) {
+            console.log(response.data);
+            this.tasks.push(response.data);
+        }.bind(this));
       this.newTask = {text: "", completed: false}; // clearing out the input and creating a new hash in it, with a different memory address, so the hash we just added isn't connected with the previous hash we've added. We had to create a new hash somewhere, or else it nwould have the same memory address.
-     }
-    },
+     },
     completeTask: function(inputTask) {
       inputTask.completed = !inputTask.completed;
     },
@@ -106,3 +160,12 @@ export default {
   computed: {}
 };
 </script>
+
+<!-- var id = this.inputTask.id
+
+      axios
+        .delete("http://localhost:3000/api/${id}")
+        .then(function(response) {
+          console.log(repsonse)
+        })
+ -->

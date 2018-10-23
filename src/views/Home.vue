@@ -1,15 +1,26 @@
 <template>
   <div class="home">
-    <h1>To do list: {{ calculateIncomplete() }} items left</h1>
+
+    <h2>To do list: {{ calculateIncomplete() }} items left</h2>
 
     <div>
-        <input v-model="newTask.text"><br/>
+        <input v-model="newTask.text" placeholder="Enter task..."><br/>
         <button v-on:click="addTask()">Add task</button>
     </div>
 
+    <div>
+    <input v-model="taskFilter" list="tasks" placeholder="Search...">
+    <datalist id="tasks">
+      <option v-for="task in tasks">{{task.text}}</option>
+    </datalist>
+    </div>
+
+    <div>
+      <button v-on:click="setSortAttribute('text')">Sort tasks</button>
+    </div>
 
     <ol>
-      <h2><li v-for="task in tasks" v-on:click="completeTask(task)" v-bind:class="{strike: task.completed}">{{task.text}}</li></h2>
+      <h2><transition-group name="fade"><li v-for="task in orderBy(filterBy(tasks, taskFilter, 'text'), sortAttribute, sortOrder)" v-bind:key="task.id" v-on:click="completeTask(task)" v-bind:class="{strike: task.completed}">{{task.text}}</li></transition-group></h2>
     </ol>
 
       <div>
@@ -21,11 +32,19 @@
 
 <style>
 
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
 body {
   width: 100wh;
   height: 90vh;
-  color: #fff;
-  background: linear-gradient(-45deg, #000000, #003300, #0000AA, #0AB300);
+  color: white;
+  background: linear-gradient(-45deg, #FFFFFF, #003300, #0000AA, #FFFFFF);
   background-size: 400% 400%;
   -webkit-animation: Gradient 15s ease infinite;
   -moz-animation: Gradient 15s ease infinite;
@@ -80,9 +99,9 @@ h1, h6 {
 
   input {
     border: solid;
-    padding-bottom: 100px;
+    padding-bottom: 30px;
     width: 500px;
-    font-size: 75px;
+    font-size: 20px;
   }
 
   .strike {
@@ -110,7 +129,10 @@ export default {
   data: function() {
     return {
       tasks: [],
-      newTask: {text: "", completed: false}
+      newTask: {text: "", completed: false},
+      taskFilter: "",
+      sortAttribute: "text",
+      sortOrder: -1
     };
   },
   created: function() {
@@ -122,6 +144,14 @@ export default {
     .bind(this));
   },
   methods: {
+    setSortAttribute: function(inputAttribute) {
+      if (this.sortAttribute === inputAttribute) {
+        this.sortOrder = this.sortOrder * -1;
+      } else {
+        this.sortOrder = 1;
+      }
+      this.sortAttribute = inputAttribute;
+    },
     addTask: function() {
         var params = {text: this.newTask.text};
 
@@ -160,12 +190,3 @@ export default {
   computed: {}
 };
 </script>
-
-<!-- var id = this.inputTask.id
-
-      axios
-        .delete("http://localhost:3000/api/${id}")
-        .then(function(response) {
-          console.log(repsonse)
-        })
- -->
